@@ -26,7 +26,7 @@ export class TasksController {
   // }  //NOt working with search
 
   @Get()
-  getTasks(@Query() filterDto: GetTasksFilterDto): TASK[] {
+  getTasks(@Query(ValidationPipe) filterDto: GetTasksFilterDto): TASK[] {
     if (Object.keys(filterDto).length) {
       return this.tasksService.getTasksWithFilters(filterDto);
     } else {
