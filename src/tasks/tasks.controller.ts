@@ -7,9 +7,12 @@ import {
   Patch,
   Post,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task-dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
+import { TaskStatusValidationPipe } from './pipes/task-status-validation.pipe';
 import { TASK, TaskStatus } from './task.model';
 import { TasksService } from './tasks.service';
 
@@ -37,12 +40,14 @@ export class TasksController {
   }
 
   @Post()
+  @UsePipes(ValidationPipe)
   //Body() is from thunder or postman to take input in json, form-encoded
   createTask(@Body() createTaskDto: CreateTaskDto): TASK {
     return this.tasksService.createTask(createTaskDto); //saved in TASK by getAllTAsks
   }
 
   @Delete('/:id')
+  //void --cause we dont return any value
   deleteTask(@Param('id') id: string): void {
     return this.tasksService.deleteTask(id);
   }
@@ -50,7 +55,7 @@ export class TasksController {
   @Patch('/:id/status')
   updateTaskStatus(
     @Param('id') id: string,
-    @Body('status') status: TaskStatus,
+    @Body('status', TaskStatusValidationPipe) status: TaskStatus,
   ): TASK {
     return this.tasksService.updateTaskStatus(id, status);
   }

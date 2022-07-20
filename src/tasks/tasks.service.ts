@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TASK, TaskStatus } from './task.model';
 import { v1 as uuid } from 'uuid';
 import { CreateTaskDto } from './dto/create-task-dto';
@@ -34,7 +34,12 @@ export class TasksService {
   }
 
   getTaskById(id: string): TASK {
-    return this.tasks.find((task) => task.id === id);
+    const found = this.tasks.find((task) => task.id === id);
+    if (!found) {
+      throw new NotFoundException(`id=${id} not found`);
+    } else {
+      return found;
+    }
   }
 
   //want to define in controllers
@@ -50,7 +55,8 @@ export class TasksService {
     return task;
   }
   deleteTask(id: string): void {
-    this.tasks = this.tasks.filter((task) => task.id !== id);
+    const found = this.getTaskById(id);
+    this.tasks = this.tasks.filter((task) => task.id !== found.id);
   }
   updateTaskStatus(id: string, status: TaskStatus): TASK {
     const task = this.getTaskById(id);
